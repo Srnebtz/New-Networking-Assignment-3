@@ -5,20 +5,21 @@ from typing import Dict, Tuple, List
 class Graph:
     def __init__(self):
         # mapping nodes to distance vector table
-        self.nodes:Dict[str, Dict[Tuple[str, str], int]] = {}
+        # item is a dict mapping (destination, next hop): distance
+        self.D:Dict[str, Dict[Tuple[str, str], int]] = {}
         self.edges:Dict[Tuple[str, str], int] = {}
         return
     
     def get_nodes(self) -> List[str]:
         # Returns the name of the router in the network, in alphabetical order
-        nodes = self.nodes.keys()
+        nodes = self.D.keys()
         nodes = list(sorted(nodes))
         return nodes
     
     def add_node(self, name:str) -> None:
         # Add router if not exist
-        if name not in self.nodes:
-            self.nodes[name] = {}
+        if name not in self.D:
+            self.D[name] = {}
         return
     
     def add_edge(self, a:str, b:str, cost:int) -> None:
@@ -39,8 +40,16 @@ class Graph:
             self.edges[edge] = cost
         return
     
+    def __init_dv(self):
+        # D_x(y) = c(x, y)
+        for (x, y), cost in self.edges:
+            self.D[x][(y, y)] = cost
+            self.D[y][(x, x)] = cost
+        return
+    
     def update(self):
-        pass
+        while True:
+            self.__init_dv()
     
     def print_route_table(self):
         pass
