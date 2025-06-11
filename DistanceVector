@@ -1,0 +1,46 @@
+#!/usr/bin/env python3
+from typing import Dict, Tuple
+
+
+class Graph:
+    def __init__(self):
+        # mapping nodes to distance vector table
+        self.nodes:Dict[str, Dict[Tuple[str, str], int]] = {}
+        self.edges:Dict[Tuple[str, str], int] = {}
+        return
+    
+    def get_nodes(self):
+        pass
+    
+    def add_node(self, name:str):
+        # Add router if not exist
+        if name not in self.nodes:
+            self.nodes[name] = {}
+        return
+    
+    def add_edge(self, a:str, b:str, cost:int):
+        # add router if not exist
+        self.add_node(a)
+        self.add_node(b)
+        
+        # create a key
+        if a > b:
+            a, b = b, a
+        edge = (a, b)
+        
+        # remove edge if cost == -1
+        if cost == -1:
+            if edge in self.edges:
+                self.edges.pop(edge)
+        else:
+            self.edges[edge] = cost
+        return
+    
+    def update(self):
+        pass
+    
+    def print_route_table(self):
+        pass
+    
+    def print_distance_table(self):
+        pass
