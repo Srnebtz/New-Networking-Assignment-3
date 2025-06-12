@@ -8,6 +8,7 @@ class Graph:
         # item is a dict mapping (destination, next hop): distance
         self.D:Dict[str, Dict[Tuple[str, str], int]] = {}
         self.edges:Dict[Tuple[str, str], int] = {}
+        self.t = 0
         return
     
     def get_nodes(self) -> List[str]:
@@ -50,13 +51,13 @@ class Graph:
     
     def __dv_algorithm(self, Dx, Dy, y:str, cost:int):
         # update the next hop of y's rotuer table
-        # Dx(dest) = Dx(y) + Dy(dest)
-        Dy_new = {(dest, y): cost + cost1 for (dest, _), cost1 in Dy}
+        # Dx(dest) = min(Dx(dest), Dx(y) + Dy(dest))
+        Dy_new = {(dest, y): cost + cost1 for (dest, _), cost1 in Dy.items()}
         
         # merge the two distance table
         for key in Dy_new:
-            if key not in Dx or Dx[key] > Dy[key]:
-                Dx[key] = Dy[key]
+            if key not in Dx or Dx[key] > Dy_new[key]:
+                Dx[key] = Dy_new[key]
         return
     
     def __update_dv(self, D_prev) -> bool:
@@ -83,13 +84,34 @@ class Graph:
             # no update, break the loop
             break
         self.print_route_table()
-            
+        return
     
     def print_route_table(self):
-        pass
+        for r in self.get_nodes():
+            print(f'Routing Table of router {r}:')
+            print()
+        return
+    
+    
+    def __print_distance_talbe_of_x(self, x:str, routers:List[str]):
+        # Print distance table according to the given format
+        routers.remove(x)
+        print('', *routers, sep='\t')
+        Dx = self.D[x]
+        for dest in routers:
+            row = [dest] + [Dx.get((dest, next_hop), 'INF') for next_hop in routers]
+            print(*row, sep='\t')
+        print()
+        return
+            
     
     def print_distance_table(self):
-        pass
+        # Prints the distance table of each router in alphabetical order
+        for x in self.get_nodes():
+            print(f'Distance Table of router {x} at t={self.t}:')
+            self.__print_distance_talbe_of_x(x, self.get_nodes())
+        self.t += 1
+        return
 
 
 if __name__ == '__main__':
