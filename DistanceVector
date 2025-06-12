@@ -52,10 +52,13 @@ class Graph:
         return
     
     
-    def __dv_algorithm(self, Dx, Dy, y:str, cost:int):
+    def __dv_algorithm(self, Dx, Dy, y:str, cost:int, x):
         # update the next hop of y's rotuer table
         # Dx(dest) = min(Dx(dest), Dx(y) + Dy(dest))
-        Dy_new = {(dest, y): cost + cost1 for (dest, _), cost1 in Dy.items()}
+        Dy_new = {}
+        for (dest, next_hop), cost1 in Dy.items():
+            if next_hop != x:
+                Dy_new[(dest, y)] = cost + cost1
         
         # merge the two distance table
         for key in Dy_new:
@@ -68,8 +71,8 @@ class Graph:
         # D_prev is the distance table from time step t-1
         for (x, y), cost in self.edges.items():
             # update Dx distance table inplace with Dy's distance table inplace
-            self.__dv_algorithm(Dx=self.D[x], Dy=D_prev[y], y=y, cost=cost)
-            self.__dv_algorithm(Dx=self.D[y], Dy=D_prev[x], y=x, cost=cost)
+            self.__dv_algorithm(Dx=self.D[x], Dy=D_prev[y], y=y, cost=cost, x=x)
+            self.__dv_algorithm(Dx=self.D[y], Dy=D_prev[x], y=x, cost=cost, x=y)
         return D_prev != self.D
 
     def update(self):
