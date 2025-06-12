@@ -42,14 +42,35 @@ class Graph:
     
     def __init_dv(self):
         # D_x(y) = c(x, y)
-        for (x, y), cost in self.edges:
+        for (x, y), cost in self.edges.items():
             self.D[x][(y, y)] = cost
             self.D[y][(x, x)] = cost
         return
     
+    
+    def __dv_algorithm(self, Dx, Dy, next_hop):
+        # update the next hop of y's rotuer table
+        Dy_new = {(dest, next_hop): cost for (dest, _), cost in Dy}
+        
+        # merge the two distance table
+        for key in Dy_new:
+            if key not in Dx or Dx[key] > Dy[key]:
+                Dx[key] = Dy[key]
+        return
+    
+    def __update_dv(self):
+        for (x, y), cost in self.edges.items():
+            D_x = self.D[x]
+            D_y = self.D[y]
+        
+        # merge
+        
+    
     def update(self):
         while True:
             self.__init_dv()
+            self.__update_dv()
+            
     
     def print_route_table(self):
         pass
