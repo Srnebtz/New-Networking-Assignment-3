@@ -48,10 +48,10 @@ class Graph:
         return
     
     
-    def __dv_algorithm(self, Dx, Dy, next_hop:str, cost:int):
+    def __dv_algorithm(self, Dx, Dy, y:str, cost:int):
         # update the next hop of y's rotuer table
         # Dx(dest) = Dx(y) + Dy(dest)
-        Dy_new = {(dest, next_hop): cost + cost1 for (dest, _), cost1 in Dy}
+        Dy_new = {(dest, y): cost + cost1 for (dest, _), cost1 in Dy}
         
         # merge the two distance table
         for key in Dy_new:
@@ -59,24 +59,30 @@ class Graph:
                 Dx[key] = Dy[key]
         return
     
-    def __update_dv(self, D_prev):
+    def __update_dv(self, D_prev) -> bool:
+        # Return True if have update
         # D_prev is the distance table from time step t-1
         for (x, y), cost in self.edges.items():
             # update Dx distance table inplace with Dy's distance table inplace
-            self.__dv_algorithm(Dx=self.D[x], Dy=D_prev[y], next_hop=y, cost=cost)
-            self.__dv_algorithm(Dx=self.D[y], Dy=D_prev[x], next_hop=x, cost=cost)
-        
-        return
+            self.__dv_algorithm(Dx=self.D[x], Dy=D_prev[y], y=y, cost=cost)
+            self.__dv_algorithm(Dx=self.D[y], Dy=D_prev[x], y=x, cost=cost)
+        return D_prev != self.D
 
-        
-    
     def update(self):
         while True:
             D_prev = deepcopy(self.D)
             # Putting init_dv here ensures that when deleting an edge, 
             # the corresponding distance information can be deleted.
             self.__init_dv()
-            self.__update_dv(D_prev)
+            
+            # if distance table updated, print distance talbe and continue
+            if self.__update_dv(D_prev):
+                self.print_distance_table()
+                continue
+            
+            # no update, break the loop
+            break
+        self.print_route_table()
             
     
     def print_route_table(self):
