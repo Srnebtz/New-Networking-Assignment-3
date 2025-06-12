@@ -42,6 +42,9 @@ class Graph:
         return
     
     def __init_dv(self):
+        for k in self.D:
+            self.D[k].clear()
+            
         # D_x(y) = c(x, y)
         for (x, y), cost in self.edges.items():
             self.D[x][(y, y)] = cost
