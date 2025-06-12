@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from typing import Dict, Tuple, List
-
+from copy import deepcopy
 
 class Graph:
     def __init__(self):
@@ -48,9 +48,10 @@ class Graph:
         return
     
     
-    def __dv_algorithm(self, Dx, Dy, next_hop):
+    def __dv_algorithm(self, Dx, Dy, next_hop:str, cost:int):
         # update the next hop of y's rotuer table
-        Dy_new = {(dest, next_hop): cost for (dest, _), cost in Dy}
+        # Dx(dest) = Dx(y) + Dy(dest)
+        Dy_new = {(dest, next_hop): cost + cost1 for (dest, _), cost1 in Dy}
         
         # merge the two distance table
         for key in Dy_new:
@@ -58,18 +59,24 @@ class Graph:
                 Dx[key] = Dy[key]
         return
     
-    def __update_dv(self):
+    def __update_dv(self, D_prev):
+        # D_prev is the distance table from time step t-1
         for (x, y), cost in self.edges.items():
-            D_x = self.D[x]
-            D_y = self.D[y]
+            # update Dx distance table inplace with Dy's distance table inplace
+            self.__dv_algorithm(Dx=self.D[x], Dy=D_prev[y], next_hop=y, cost=cost)
+            self.__dv_algorithm(Dx=self.D[y], Dy=D_prev[x], next_hop=x, cost=cost)
         
-        # merge
+        return
+
         
     
     def update(self):
         while True:
+            D_prev = deepcopy(self.D)
+            # Putting init_dv here ensures that when deleting an edge, 
+            # the corresponding distance information can be deleted.
             self.__init_dv()
-            self.__update_dv()
+            self.__update_dv(D_prev)
             
     
     def print_route_table(self):
